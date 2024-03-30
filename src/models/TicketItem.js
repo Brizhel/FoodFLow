@@ -1,4 +1,4 @@
-class OrderItem {
+class TicketItem {
   constructor(id, order, dish, comment) {
     this.id = id;
     this.order = order;
@@ -7,4 +7,4 @@ class OrderItem {
   }
 }
 
-export default OrderItem;
+export default TicketItem;

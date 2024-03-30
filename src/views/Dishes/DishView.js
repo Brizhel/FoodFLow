@@ -19,9 +19,11 @@ function DishView() {
     const { name, value } = event.target;
     setNewDish({ ...newDish, [name]: value });
   };
-  const handleAddDish = () => {
+  const handleAddDish = async () => {
+    const fixedValue = newDish.fixed === "on" ? true : false;
     if (editDishId) {
-      // Editar el plato existente
+      const updatedDish = { ...newDish, fixed: fixedValue };
+      await dishController.updateDish(editDishId, updatedDish);
       const updatedDishes = dishes.map(dish => {
         if (dish.id === editDishId) {
           return { ...newDish, id: editDishId };
@@ -76,7 +78,7 @@ function DishView() {
                 <Card.Title>{dish.name}</Card.Title>
                 <Card.Text>{dish.description}</Card.Text>
                 <Card.Text>Precio: {dish.price}</Card.Text>
-                <Card.Text>¿Fijo?: {dish.fixed ? 'Sí' : 'No'}</Card.Text>
+                <Card.Text>¿Fijo?: {dish.fixed === 'on' ? 'Sí' : 'No'}</Card.Text>
                 <Button variant="primary" onClick={() => handleEditDish(dish.id)}>Editar</Button>{' '}
                 <Button variant="danger" onClick={() => handleDeleteDish(dish.id)}>Borrar</Button>
               </Card.Body>
@@ -107,7 +109,7 @@ function DishView() {
               <Form.Control type="number" name="price" value={newDish.price} onChange={handleInputChange} />
             </Form.Group>
             <Form.Group controlId="formFixed">
-              <Form.Check type="checkbox" label="Fijo" name="fixed" checked={newDish.fixed} onChange={handleInputChange} />
+              <Form.Check type="checkbox" label="Fijo" name="fixed"   checked={newDish.fixed === "on"} onChange={(event) => handleInputChange({ target: { name: 'fixed', value: event.target.checked ? 'on' : 'off' } })} />
             </Form.Group>
           </Form>
         </Modal.Body>

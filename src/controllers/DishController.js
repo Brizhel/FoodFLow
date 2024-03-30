@@ -46,7 +46,25 @@ class DishController {
       throw new Error('Error al eliminar el plato');
     }
   }
-  // Otros métodos del controlador
+  async updateDish(dishId, updatedDish) {
+    if (!dishId || !updatedDish) {
+      throw new Error('ID de plato o plato actualizado no válido');
+    }
+  
+    const response = await fetch(`${this.baseUrl}/${dishId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedDish)
+    });
+  
+    if (!response.ok) {
+      throw new Error('Error al actualizar el plato');
+    }
+  
+    return await response.json();
+  }
 }
 
 export default DishController;
