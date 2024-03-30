@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Modal, Form } from 'react-bootstrap';
 import DishController from '../../controllers/DishController';
+import { usePage } from '../../PageContext';
 
 function DishView() {
+  const { setCurrentPage } = usePage();
   const [dishes, setDishes] = useState([]);
   const dishController = new DishController();
   const [showModal, setShowModal] = useState(false);
@@ -64,9 +66,9 @@ function DishView() {
         console.error('Error al obtener los platos:', error.message);
       }
     };
-
+    setCurrentPage('Platos');
     fetchDishes();
-  }, []);
+  }, [setCurrentPage]);
 
   return (
     <Container className='mt-5'>
@@ -77,7 +79,7 @@ function DishView() {
               <Card.Body>
                 <Card.Title>{dish.name}</Card.Title>
                 <Card.Text>{dish.description}</Card.Text>
-                <Card.Text>Precio: {dish.price}</Card.Text>
+                <Card.Text>Precio: {dish.price}COP</Card.Text>
                 <Card.Text>¿Fijo?: {dish.fixed === 'on' ? 'Sí' : 'No'}</Card.Text>
                 <Button variant="primary" onClick={() => handleEditDish(dish.id)}>Editar</Button>{' '}
                 <Button variant="danger" onClick={() => handleDeleteDish(dish.id)}>Borrar</Button>
@@ -92,7 +94,7 @@ function DishView() {
       {/* Modal para añadir plato */}
       <Modal contentClassName="bg-darkgray1" show={showModal} onHide={handleCloseModal} closeButton={<button className="custom-close-button">×</button>}>
         <Modal.Header closeButton closeButtonClassName="custom-modal-close-btn">
-          <Modal.Title>Añadir plato</Modal.Title>
+          <Modal.Title>{editDishId ? 'Editar plato' : 'Añadir plato'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -115,7 +117,7 @@ function DishView() {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>Cancelar</Button>
-          <Button variant="primary" className='btn-orange1'  onClick={handleAddDish}>{editDishId ? 'Guardar cambios' : 'Guardar'}</Button>
+          <Button variant="primary" className='btn-orange1'  onClick={handleAddDish}>{editDishId ? 'Guardar cambios' : 'Añadir'}</Button>
         </Modal.Footer>
       </Modal>
     </Container>

@@ -1,8 +1,9 @@
-import React, { useContext, useState } from 'react';
+import React, {useContext, useState } from 'react';
 import { Navbar, Nav } from 'react-bootstrap';
+import { usePage } from '../../PageContext';
 import { Link } from 'react-router-dom';
-import DishView from'../../views/Dishes/DishView';
 function AdminLayout({ children }) {
+    const { currentPage } = usePage(); // Obtén el nombre de la página del contexto
     const [expanded, setExpanded] = useState(false);
     const handleNavCollapse = () => {
         setExpanded(false); // Colapsar la barra de navegación
@@ -10,15 +11,15 @@ function AdminLayout({ children }) {
     return (
         <div>
             <Navbar bg="dark" variant="dark" expand="lg" expanded={expanded} className="sticky-top">
-                <Navbar.Brand className='mx-4' href="#home">Administrador</Navbar.Brand>
+                <Navbar.Brand className='mx-4'>{currentPage}</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={() => setExpanded(!expanded)} />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mr-auto">
                         <Nav.Link as={Link} to='/' onClick={handleNavCollapse}>Inicio</Nav.Link>
                         <Nav.Link as={Link} to='/admin/dishes' onClick={handleNavCollapse}>Platos</Nav.Link>
-                        <Nav.Link href='#meseros' onClick={handleNavCollapse}>Meseros</Nav.Link>
+                        <Nav.Link as={Link} to='/admin/waiters' onClick={handleNavCollapse}>Meseros</Nav.Link>
                         <Nav.Link href='#Pedidos' onClick={handleNavCollapse}>Pedidos</Nav.Link>
-                        <Nav.Link href='#Mesas' onClick={handleNavCollapse}>Mesas</Nav.Link>
+                        <Nav.Link as={Link} to='/admin/tables' onClick={handleNavCollapse}>Mesas</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
                 <Navbar.Collapse className="ml-auto mx-4 justify-content-end">
