@@ -51,10 +51,7 @@ class TicketController {
 
   async createTicket(ticket, waiterId) {
     try {
-      const response = await axios.post(this.baseUrl, {
-        ...ticket,
-        waiterId: waiterId
-      });
+      const response = await axios.post(`${this.baseUrl}?waiterId=${waiterId}`, ticket);
       return response.data;
     } catch (error) {
       throw new Error('Error al crear el ticket');

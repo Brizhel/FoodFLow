@@ -1,7 +1,7 @@
 class Ticket {
-  constructor(id, table, ticketItems, comment, creationDate, delivered, waiter) {
+  constructor(id, diningTable, ticketItems, comment, creationDate, delivered, waiter) {
     this.id = id;
-    this.table = table;
+    this.diningTable = diningTable;
     this.ticketItems = ticketItems;
     this.comment = comment;
     this.creationDate = creationDate;

@@ -8,7 +8,7 @@ import Ticket from '../../models/Ticket';
 import UserContext from '../../UserContext';
 
 function TicketFormModal({ show, handleClose }) {
-    const { waiterId } = useContext(UserContext); // Obtener el waiterId del contexto de usuario
+    const { user } = useContext(UserContext);
     const [tables, setTables] = useState([]);
     const [dishes, setDishes] = useState([]);
     const [selectedTable, setSelectedTable] = useState(null);
@@ -19,8 +19,8 @@ function TicketFormModal({ show, handleClose }) {
     const [dishComment, setDishComment] = useState('');
 
     useEffect(() => {
-      // Commented out fetching real data from server
-        /*
+        // Commented out fetching real data from server
+        
         // Fetch tables from the server
         const tableController = new DiningTableController();
         tableController.getAllTables()
@@ -33,13 +33,13 @@ function TicketFormModal({ show, handleClose }) {
             .then(data => setDishes(data))
             .catch(error => console.error('Error fetching dishes:', error));
         
-*/
+
         // Using mocked data (commented out)
-        
+/*
         setTables(mockTables);
         setDishes(mockDishes);
         setSelectedTable(mockTables.length > 0 ? mockTables[0] : null);
-        
+*/
         setSelectedTable(null);
     }, [show]);
 
@@ -68,7 +68,8 @@ function TicketFormModal({ show, handleClose }) {
 
     const handleSubmit = async () => {
         const ticket = new Ticket(null, selectedTable, ticketItems, comment, new Date(), false, null);
-        console.log('Waiter ID= ' + waiterId + 'Ticket ID =' +ticket);
+        const waiterId= user.waiterId;
+        console.log('Waiter ID= ' + waiterId + 'Ticket=', ticket);
         const ticketController = new TicketController;
         const newTicket = await ticketController.createTicket(ticket, waiterId)
         handleCloseModal();
