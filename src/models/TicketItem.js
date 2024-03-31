@@ -1,7 +1,6 @@
 class TicketItem {
-  constructor(id, order, dish, comment) {
+  constructor(id, dish, comment) {
     this.id = id;
-    this.order = order;
     this.dish = dish;
     this.comment = comment;
   }

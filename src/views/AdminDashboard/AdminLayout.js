@@ -18,7 +18,7 @@ function AdminLayout({ children }) {
                         <Nav.Link as={Link} to='/' onClick={handleNavCollapse}>Inicio</Nav.Link>
                         <Nav.Link as={Link} to='/admin/dishes' onClick={handleNavCollapse}>Platos</Nav.Link>
                         <Nav.Link as={Link} to='/admin/waiters' onClick={handleNavCollapse}>Meseros</Nav.Link>
-                        <Nav.Link href='#Pedidos' onClick={handleNavCollapse}>Pedidos</Nav.Link>
+                        <Nav.Link as={Link} to='/admin/tickets' onClick={handleNavCollapse}>Pedidos</Nav.Link>
                         <Nav.Link as={Link} to='/admin/tables' onClick={handleNavCollapse}>Mesas</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>

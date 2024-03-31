@@ -7,12 +7,11 @@ const LoginController = {
     try {
       // Realizar solicitud de inicio de sesión al servidor
       const response = await axios.post('/auth/login', { username, password });
-      
-      // Extraer el rol del usuario de la respuesta del servidor
-      const role = response.data.role;
-      
-      // Devolver el rol del usuario
-      return role;
+
+      const { role, waiterId } = response.data;
+
+      // Devolver el rol y el ID del mesero del usuario
+      return { role, waiterId };
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
       throw new Error('Error al iniciar sesión. Verifica tus credenciales.');

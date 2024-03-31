@@ -21,6 +21,9 @@ body {
   background: hsl(25, 97%, 53%);
   border: none;
 }
+.table-modal {
+  z-index: 999999; /* Puedes ajustar este valor según sea necesario */
+}
 
 .btn-orange1:hover {
   background-color: white;

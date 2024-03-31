@@ -34,8 +34,9 @@ function DishView() {
       });
       setDishes(updatedDishes);
     } else {
-      dishController.createDish(newDish);
-      setDishes([...dishes, { ...newDish, id: dishes.length + 1 }]);
+      const response = await dishController.createDish(newDish);
+      console.log(response);
+      setDishes([...dishes, response]);
     }
     handleCloseModal(); // Cerrar el modal después de agregar/editar el plato
     setNewDish({ id: null, name: '', description: '', price: 0, fixed: false }); // Limpiar los campos del formulario
