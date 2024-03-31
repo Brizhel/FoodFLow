@@ -7,7 +7,7 @@ import { mockTables, mockDishes } from '../../data'; // Commented out mock data 
 import Ticket from '../../models/Ticket';
 import UserContext from '../../UserContext';
 
-function TicketFormModal({ show, handleClose }) {
+function TicketFormModal({ show, handleClose, addNewTicket}) {
     const { user } = useContext(UserContext);
     const [tables, setTables] = useState([]);
     const [dishes, setDishes] = useState([]);
@@ -69,9 +69,9 @@ function TicketFormModal({ show, handleClose }) {
     const handleSubmit = async () => {
         const ticket = new Ticket(null, selectedTable, ticketItems, comment, new Date(), false, null);
         const waiterId= user.waiterId;
-        console.log('Waiter ID= ' + waiterId + 'Ticket=', ticket);
         const ticketController = new TicketController;
         const newTicket = await ticketController.createTicket(ticket, waiterId)
+        addNewTicket(newTicket);
         handleCloseModal();
     };
 

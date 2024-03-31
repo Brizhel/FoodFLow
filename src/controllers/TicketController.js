@@ -9,40 +9,53 @@ class TicketController {
   constructor() {
     this.baseUrl = '/api/tickets';
   }
-
   async getAllTickets() {
     try {
       const response = await axios.get(this.baseUrl);
       const ticketsData = response.data;
-      const tickets = ticketsData.map(ticketData => new Ticket(
-        ticketData.id,
-        new DiningTable(
-          ticketData.table.id,
-          ticketData.table.tableType,
-          ticketData.table.tableNumber
-        ),
-        ticketData.ticketItems.map(ticketItemData => new TicketItem(
-          ticketItemData.id,
-          new Dish(
-            ticketItemData.dish.id,
-            ticketItemData.dish.name,
-            ticketItemData.dish.description,
-            ticketItemData.dish.price,
-            ticketItemData.dish.fixed
-          ),
-          ticketItemData.comment
-        )),
-        ticketData.comment,
-        new Date(ticketData.creationDate),
-        ticketData.delivered,
-        new Waiter(
-          ticketData.waiter.id,
-          ticketData.waiter.firstName,
-          ticketData.waiter.lastName,
-          ticketData.waiter.username,
-          ticketData.waiter.password
-        )
-      ));
+
+      const tickets = ticketsData.map(ticketData => {
+        const { id, diningTable, ticketItems, comment, creationDate, delivered, waiter } = ticketData;
+
+        const diningTableObject = new DiningTable(diningTable.id, diningTable.tableType, diningTable.tableNumber);
+
+        const ticketItemsArray = ticketItems.map(ticketItemData => {
+          const { id, dish, comment } = ticketItemData;
+          const dishObject = new Dish(dish.id, dish.name, dish.description, dish.price, dish.fixed);
+          return new TicketItem(id, dishObject, comment);
+        });
+
+        const waiterObject = new Waiter(waiter.id, waiter.firstName, waiter.lastName, waiter.username, waiter.password);
+
+        return new Ticket(id, diningTableObject, ticketItemsArray, comment, new Date(creationDate), delivered, waiterObject);
+      });
+
+      return tickets;
+    } catch (error) {
+      throw new Error('Error al obtener los tickets');
+    }
+  }
+  async getAllTicketsOfToday() {
+    try {
+      const response = await axios.get('${this.baseUrl}/today');
+      const ticketsData = response.data;
+
+      const tickets = ticketsData.map(ticketData => {
+        const { id, diningTable, ticketItems, comment, creationDate, delivered, waiter } = ticketData;
+
+        const diningTableObject = new DiningTable(diningTable.id, diningTable.tableType, diningTable.tableNumber);
+
+        const ticketItemsArray = ticketItems.map(ticketItemData => {
+          const { id, dish, comment } = ticketItemData;
+          const dishObject = new Dish(dish.id, dish.name, dish.description, dish.price, dish.fixed);
+          return new TicketItem(id, dishObject, comment);
+        });
+
+        const waiterObject = new Waiter(waiter.id, waiter.firstName, waiter.lastName, waiter.username, waiter.password);
+
+        return new Ticket(id, diningTableObject, ticketItemsArray, comment, new Date(creationDate), delivered, waiterObject);
+      });
+
       return tickets;
     } catch (error) {
       throw new Error('Error al obtener los tickets');

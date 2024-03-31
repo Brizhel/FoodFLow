@@ -1,5 +1,5 @@
-import React, {useContext, useState } from 'react';
-import { Navbar, Nav } from 'react-bootstrap';
+import React, { useContext, useState } from 'react';
+import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
 import { usePage } from '../../PageContext';
 import { Link } from 'react-router-dom';
 function AdminLayout({ children }) {
@@ -7,7 +7,7 @@ function AdminLayout({ children }) {
     const [expanded, setExpanded] = useState(false);
     const handleNavCollapse = () => {
         setExpanded(false); // Colapsar la barra de navegación
-      };
+    };
     return (
         <div>
             <Navbar bg="dark" variant="dark" expand="lg" expanded={expanded} className="sticky-top">
@@ -18,7 +18,10 @@ function AdminLayout({ children }) {
                         <Nav.Link as={Link} to='/' onClick={handleNavCollapse}>Inicio</Nav.Link>
                         <Nav.Link as={Link} to='/admin/dishes' onClick={handleNavCollapse}>Platos</Nav.Link>
                         <Nav.Link as={Link} to='/admin/waiters' onClick={handleNavCollapse}>Meseros</Nav.Link>
-                        <Nav.Link as={Link} to='/admin/tickets' onClick={handleNavCollapse}>Pedidos</Nav.Link>
+                        <NavDropdown title="Pedidos" id="basic-nav-dropdown" className='custom-dropdown'>
+                            <NavDropdown.Item as={Link} to='/admin/tickets'>Pendientes</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to='/admin/tickets/today'>Del día</NavDropdown.Item>
+                        </NavDropdown>                        
                         <Nav.Link as={Link} to='/admin/tables' onClick={handleNavCollapse}>Mesas</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>

@@ -42,7 +42,7 @@ function TicketView() {
     useEffect(() => {
         const fetchTickets = async () => {
             try {
-                const allTickets = await ticketController.getAllTickets();
+                const allTickets = await ticketController.getAllTicketsOfToday();
                 console.log(allTickets);
                 setTickets(allTickets);
             } catch (error) {

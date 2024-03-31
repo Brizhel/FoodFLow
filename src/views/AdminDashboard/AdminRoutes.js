@@ -6,6 +6,7 @@ import DishView from'../../views/Dishes/DishView';
 import DiningTableView from '../DiningTable/DiningTableView';
 import WaiterView from '../Waiters/WaiterView';
 import TicketView from '../Tickets/TicketView';
+import TicketTodayView from '../Tickets/TicketTodayView';
 function AdminRoutes() {
   return (
     <Routes>
@@ -14,6 +15,7 @@ function AdminRoutes() {
       <Route path='/tables' element={<DiningTableView />} />
       <Route path='/waiters' element={<WaiterView />} />
       <Route path='/tickets' element={<TicketView />} />
+      <Route path='/tickets/today' element={<TicketTodayView />} />
     </Routes>
   );
 }
