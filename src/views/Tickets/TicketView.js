@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import TicketController from '../../controllers/TicketController';
 import TicketFormModal from './TicketFormModal';
+import useConfirmation from '../useConfirmation'; // Importa la función useConfirmation
+import ConfirmationModal from '../Modals/ConfirmationModal';
+import TicketWebsocketController from '../../controllers/TicketWebsocketController';
 
 function TicketView() {
     const [showModal, setShowModal] = useState(false);
@@ -9,20 +12,35 @@ function TicketView() {
     const ticketController = new TicketController();
     const handleCloseModal = () => { setShowModal(false) };
     const handleShowModal = () => setShowModal(true);
-
-    const handleDeleteTicket = async (ticketId) => {
+    const { handleShowModal: showConfirmationModal, ConfirmationDialog } = useConfirmation(); // Usa la función useConfirmation
+    const handleMarkAsDelivered = async (ticketId) => {
         try {
-            await ticketController.deleteTicket(ticketId);
-            // Filtrar los tickets para eliminar el ticket con el ID correspondiente
-            const updatedTickets = tickets.filter(ticket => ticket.id !== ticketId);
-            setTickets(updatedTickets);
+            const confirmation = await showConfirmationModal();
+            console.log(confirmation);
+            if (confirmation) {
+                ticketController.markTicketAsDelivered(ticketId);
+                setTickets(prevTickets => prevTickets.filter(ticket => ticket.id !== ticketId));
+            }
         } catch (error) {
-            console.error('Error al eliminar el ticket:', error.message);
+            console.error('Error al marcar el ticket como entregado:', error.message);
         }
     };
-
     const addNewTicket = (newTicket) => {
         setTickets([...tickets, newTicket]);
+    };
+    const handleTicketUpdate = (updatedTicket) => {
+        setTickets(prevTickets => {
+            const index = prevTickets.findIndex(ticket => ticket.id === updatedTicket.id);
+            if (index !== -1) {
+                // Si el ticket ya existe, actualiza el ticket en la lista
+                const updatedTickets = [...prevTickets];
+                updatedTickets[index] = updatedTicket;
+                return updatedTickets;
+            } else {
+                // Si el ticket no existe, agrégalo a la lista
+                return [...prevTickets, updatedTicket];
+            }
+        });
     };
     function calculateTotal(ticketItems) {
         let total = 0;
@@ -31,7 +49,14 @@ function TicketView() {
         }
         return total;
     }
-
+    const fetchTickets = async () => {
+        try {
+            const allTickets = await ticketController.getAllTickets();
+            setTickets(allTickets);
+        } catch (error) {
+            console.error('Error al obtener los tickets:', error.message);
+        }
+    };
     function formatTime(dateString) {
         const date = new Date(dateString);
         const hours = date.getHours().toString().padStart(2, '0');
@@ -40,17 +65,8 @@ function TicketView() {
     }
 
     useEffect(() => {
-        const fetchTickets = async () => {
-            try {
-                const allTickets = await ticketController.getAllTickets();
-                console.log(allTickets);
-                setTickets(allTickets);
-            } catch (error) {
-                console.error('Error al obtener los tickets:', error.message);
-            }
-        };
         fetchTickets();
-    }, []);
+    }, [showModal]);
 
     return (
         <Container className='mt-5'>
@@ -70,7 +86,7 @@ function TicketView() {
                                 ))}
                                 <Card.Footer>{ticket.comment}</Card.Footer>
                                 <Card.Text style={{ opacity: 0.6 }}>Total: {calculateTotal(ticket.ticketItems)}$</Card.Text>
-                                <Button className='mt-3' variant="danger" onClick={() => handleDeleteTicket(ticket.id)}>Eliminar</Button>
+                                <Button variant="success" onClick={() => handleMarkAsDelivered(ticket.id)}>Entregado</Button>
                             </Card.Body>
                         </Card>
                     </Col>
@@ -79,7 +95,10 @@ function TicketView() {
             <Col md={12} className="mb-3">
                 <Button variant="primary" onClick={handleShowModal}>Crear Ticket</Button>
             </Col>
+            {/* Componente TicketWebsocketController para manejar las actualizaciones de tickets */}
+            <TicketWebsocketController onTicketUpdate={handleTicketUpdate} />
             {/* Modal para crear un ticket */}
+            <ConfirmationDialog message="¿Seguro?" /> {/* Renderiza la ventana de confirmación */}
             <TicketFormModal show={showModal} handleClose={handleCloseModal} addNewTicket={addNewTicket} />
         </Container>
     );

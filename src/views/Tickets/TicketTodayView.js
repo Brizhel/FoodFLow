@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import TicketController from '../../controllers/TicketController';
 import TicketFormModal from './TicketFormModal';
+import ConfirmationModal from '../Modals/ConfirmationModal';
+import useConfirmation from '../useConfirmation';
 
 function TicketView() {
     const [showModal, setShowModal] = useState(false);
@@ -9,15 +11,30 @@ function TicketView() {
     const ticketController = new TicketController();
     const handleCloseModal = () => { setShowModal(false) };
     const handleShowModal = () => setShowModal(true);
+    const { handleShowModal: showConfirmationModal, ConfirmationDialog } = useConfirmation(); // Usa la función useConfirmation
+
 
     const handleDeleteTicket = async (ticketId) => {
         try {
-            await ticketController.deleteTicket(ticketId);
-            // Filtrar los tickets para eliminar el ticket con el ID correspondiente
-            const updatedTickets = tickets.filter(ticket => ticket.id !== ticketId);
-            setTickets(updatedTickets);
+            const confirmation = await showConfirmationModal(() => ticketController.deleteTicket(ticketId));
+            if (confirmation) {
+                const updatedTickets = tickets.filter(ticket => ticket.id !== ticketId);
+                setTickets(updatedTickets); // Update tickets directly with the filtered array
+            }
         } catch (error) {
             console.error('Error al eliminar el ticket:', error.message);
+        }
+    };
+
+    const handleMarkAsDelivered = async (ticketId) => {
+        try {
+            const confirmation = await showConfirmationModal(() => ticketController.markTicketAsDelivered(ticketId));
+            if (confirmation) { 
+                const updatedTickets = tickets.filter(ticket => ticket.id !== ticketId);
+                setTickets(updatedTickets); // Update tickets directly with the filtered array
+            }
+        } catch (error) {
+            console.error('Error al marcar el ticket como entregado:', error.message);
         }
     };
 
@@ -38,19 +55,19 @@ function TicketView() {
         const minutes = date.getMinutes().toString().padStart(2, '0');
         return `${hours}:${minutes}`;
     }
+    
+    const fetchTickets = async () => {
+        try {
+            const allTickets = await ticketController.getAllTicketsOfToday();
+            setTickets(allTickets);
+        } catch (error) {
+            console.error('Error al obtener los tickets:', error.message);
+        }
+    };
 
     useEffect(() => {
-        const fetchTickets = async () => {
-            try {
-                const allTickets = await ticketController.getAllTicketsOfToday();
-                console.log(allTickets);
-                setTickets(allTickets);
-            } catch (error) {
-                console.error('Error al obtener los tickets:', error.message);
-            }
-        };
         fetchTickets();
-    }, []);
+    }, [showModal]);
 
     return (
         <Container className='mt-5'>
@@ -71,7 +88,10 @@ function TicketView() {
                                 <Card.Footer>{ticket.comment}</Card.Footer>
                                 <Card.Text style={{ opacity: 0.6 }}>Total: {calculateTotal(ticket.ticketItems)}$</Card.Text>
                                 <Button className='mt-3' variant="danger" onClick={() => handleDeleteTicket(ticket.id)}>Eliminar</Button>
-                            </Card.Body>
+                                {!ticket.delivered && (
+                                    <Button variant="success" onClick={() => handleMarkAsDelivered(ticket.id)}>Entregado</Button>
+                                )}
+                                </Card.Body>
                         </Card>
                     </Col>
                 ))}
@@ -80,6 +100,7 @@ function TicketView() {
                 <Button variant="primary" onClick={handleShowModal}>Crear Ticket</Button>
             </Col>
             {/* Modal para crear un ticket */}
+            <ConfirmationDialog message="¿Seguro?" /> {/* Renderiza la ventana de confirmación */}
             <TicketFormModal show={showModal} handleClose={handleCloseModal} addNewTicket={addNewTicket} />
         </Container>
     );

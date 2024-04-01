@@ -18,7 +18,7 @@ function AdminLayout({ children }) {
                         <Nav.Link as={Link} to='/' onClick={handleNavCollapse}>Inicio</Nav.Link>
                         <Nav.Link as={Link} to='/admin/dishes' onClick={handleNavCollapse}>Platos</Nav.Link>
                         <Nav.Link as={Link} to='/admin/waiters' onClick={handleNavCollapse}>Meseros</Nav.Link>
-                        <NavDropdown title="Pedidos" id="basic-nav-dropdown" className='custom-dropdown'>
+                        <NavDropdown  bg="dark" title="Pedidos" id="basic-nav-dropdown">
                             <NavDropdown.Item as={Link} to='/admin/tickets'>Pendientes</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to='/admin/tickets/today'>Del día</NavDropdown.Item>
                         </NavDropdown>                        

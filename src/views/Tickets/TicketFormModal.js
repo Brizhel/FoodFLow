@@ -3,11 +3,10 @@ import { Modal, Button, Form, Row, Col, Container } from 'react-bootstrap';
 import DishController from '../../controllers/DishController';
 import DiningTableController from '../../controllers/DiningTableController';
 import TicketController from '../../controllers/TicketController';
-import { mockTables, mockDishes } from '../../data'; // Commented out mock data import
 import Ticket from '../../models/Ticket';
 import UserContext from '../../UserContext';
 
-function TicketFormModal({ show, handleClose, addNewTicket}) {
+function TicketFormModal({ show, handleClose, addNewTicket }) {
     const { user } = useContext(UserContext);
     const [tables, setTables] = useState([]);
     const [dishes, setDishes] = useState([]);
@@ -19,27 +18,14 @@ function TicketFormModal({ show, handleClose, addNewTicket}) {
     const [dishComment, setDishComment] = useState('');
 
     useEffect(() => {
-        // Commented out fetching real data from server
-        
-        // Fetch tables from the server
         const tableController = new DiningTableController();
         tableController.getAllTables()
             .then(data => setTables(data))
             .catch(error => console.error('Error fetching tables:', error));
-
-        // Fetch dishes from the server
         const dishController = new DishController();
         dishController.getAllDishes()
             .then(data => setDishes(data))
             .catch(error => console.error('Error fetching dishes:', error));
-        
-
-        // Using mocked data (commented out)
-/*
-        setTables(mockTables);
-        setDishes(mockDishes);
-        setSelectedTable(mockTables.length > 0 ? mockTables[0] : null);
-*/
         setSelectedTable(null);
     }, [show]);
 
@@ -68,7 +54,7 @@ function TicketFormModal({ show, handleClose, addNewTicket}) {
 
     const handleSubmit = async () => {
         const ticket = new Ticket(null, selectedTable, ticketItems, comment, new Date(), false, null);
-        const waiterId= user.waiterId;
+        const waiterId = user.waiterId;
         const ticketController = new TicketController;
         const newTicket = await ticketController.createTicket(ticket, waiterId)
         addNewTicket(newTicket);

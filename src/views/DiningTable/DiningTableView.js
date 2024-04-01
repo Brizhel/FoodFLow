@@ -67,7 +67,6 @@ function DiningTableView() {
     const fetchTables = async () => {
       try {
         const allTables = await tableController.getAllTables();
-        //const allTables = await tableController.getMockTables();
         setTables(allTables);
       } catch (error) {
         console.error('Error al obtener las mesas:', error.message);
