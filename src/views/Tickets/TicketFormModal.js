@@ -10,7 +10,7 @@ function TicketFormModal({ show, handleClose, addNewTicket }) {
     const { user } = useContext(UserContext);
     const [tables, setTables] = useState([]);
     const [dishes, setDishes] = useState([]);
-    const [selectedTable, setSelectedTable] = useState(null);
+    const [selectedTable, setSelectedTable] = useState(0);
     const [ticketItems, setTicketItems] = useState([]);
     const [comment, setComment] = useState('');
     const [selectedDish, setSelectedDish] = useState(null);
@@ -18,16 +18,29 @@ function TicketFormModal({ show, handleClose, addNewTicket }) {
     const [dishComment, setDishComment] = useState('');
 
     useEffect(() => {
-        const tableController = new DiningTableController();
-        tableController.getAllTables()
-            .then(data => setTables(data))
-            .catch(error => console.error('Error fetching tables:', error));
-        const dishController = new DishController();
-        dishController.getAllDishes()
-            .then(data => setDishes(data))
-            .catch(error => console.error('Error fetching dishes:', error));
-        setSelectedTable(null);
+        const fetchData = async () => {
+            try {
+                const tableController = new DiningTableController();
+                const fetchedTables = await tableController.getAllTables();
+                setTables(fetchedTables);
+    
+                const dishController = new DishController();
+                const fetchedDishes = await dishController.getAllDishes();
+                setDishes(fetchedDishes);
+    
+                if (fetchedTables.length > 0) {
+                    setSelectedTable(fetchedTables[0]); // Selecciona la primera mesa
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+    
+        if (show) {
+            fetchData();
+        }
     }, [show]);
+    
 
     const handleTableSelect = (tableId) => {
         const table = tables.find(table => table.id === tableId);
@@ -57,7 +70,6 @@ function TicketFormModal({ show, handleClose, addNewTicket }) {
         const waiterId = user.waiterId;
         const ticketController = new TicketController;
         const newTicket = await ticketController.createTicket(ticket, waiterId)
-        addNewTicket(newTicket);
         handleCloseModal();
     };
 
@@ -83,6 +95,7 @@ function TicketFormModal({ show, handleClose, addNewTicket }) {
                     <Form.Group>
                         <Form.Label>Seleccionar Mesa</Form.Label>
                         <Form.Control as="select" onChange={(e) => handleTableSelect(parseInt(e.target.value))}>
+                            <option value={0} disabled>Seleccionar una mesa</option>
                             {tables.map(table => (
                                 <option key={table.id} value={table.id}>{table.tableType} {table.tableNumber}</option>
                             ))}

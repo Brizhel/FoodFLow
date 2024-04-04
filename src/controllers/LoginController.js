@@ -6,7 +6,7 @@ const LoginController = {
   login: async (username, password) => {
     try {
       // Realizar solicitud de inicio de sesión al servidor
-      const response = await axios.post('/auth/login', { username, password });
+      const response = await axios.post('http://localhost/auth/login', { username, password });
 
       const { role, waiterId } = response.data;
 

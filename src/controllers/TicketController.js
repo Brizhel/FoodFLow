@@ -8,7 +8,7 @@ import Dish from '../models/Dish';
 
 class TicketController {
   constructor() {
-    this.baseUrl = '/api/tickets';
+    this.baseUrl = 'http://localhost/api/tickets';
   }
   async getAllTickets() {
     try {

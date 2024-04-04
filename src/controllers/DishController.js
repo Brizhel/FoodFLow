@@ -2,7 +2,7 @@ import axios from 'axios';
 import Dish from "../models/Dish";
 class DishController {
   constructor() {
-    this.baseUrl = '/api/dishes';
+    this.baseUrl = 'http://localhost/api/dishes';
   }
 
   async getAllDishes() {

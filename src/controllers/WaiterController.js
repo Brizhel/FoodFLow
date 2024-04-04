@@ -3,7 +3,7 @@ import Waiter from '../models/Waiter';
 
 class WaiterController {
   constructor() {
-    this.baseUrl = '/api/waiters';
+    this.baseUrl = 'http://localhost/api/waiters';
   }
 
   async getAllWaiters() {

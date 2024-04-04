@@ -4,7 +4,7 @@ import DiningTable from '../models/DiningTable';
 
 class DiningTableController {
   constructor() {
-    this.baseUrl = '/api/tables';
+    this.baseUrl = 'http://localhost/api/tables';
   }
 
   async getAllTables() {

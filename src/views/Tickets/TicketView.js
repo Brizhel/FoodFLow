@@ -5,21 +5,20 @@ import TicketFormModal from './TicketFormModal';
 import useConfirmation from '../useConfirmation'; // Importa la función useConfirmation
 import ConfirmationModal from '../Modals/ConfirmationModal';
 import TicketWebsocketController from '../../controllers/TicketWebsocketController';
-
 function TicketView() {
     const [showModal, setShowModal] = useState(false);
     const [tickets, setTickets] = useState([]);
     const ticketController = new TicketController();
     const handleCloseModal = () => { setShowModal(false) };
     const handleShowModal = () => setShowModal(true);
+    const [isComponentMounted, setIsComponentMounted] = useState(true); // Estado para controlar si el componente está montado
     const { handleShowModal: showConfirmationModal, ConfirmationDialog } = useConfirmation(); // Usa la función useConfirmation
+    
     const handleMarkAsDelivered = async (ticketId) => {
         try {
             const confirmation = await showConfirmationModal();
-            console.log(confirmation);
             if (confirmation) {
-                ticketController.markTicketAsDelivered(ticketId);
-                setTickets(prevTickets => prevTickets.filter(ticket => ticket.id !== ticketId));
+                ticketController.markTicketAsDelivered(ticketId)
             }
         } catch (error) {
             console.error('Error al marcar el ticket como entregado:', error.message);
@@ -28,20 +27,38 @@ function TicketView() {
     const addNewTicket = (newTicket) => {
         setTickets([...tickets, newTicket]);
     };
-    const handleTicketUpdate = (updatedTicket) => {
-        setTickets(prevTickets => {
-            const index = prevTickets.findIndex(ticket => ticket.id === updatedTicket.id);
-            if (index !== -1) {
-                // Si el ticket ya existe, actualiza el ticket en la lista
-                const updatedTickets = [...prevTickets];
-                updatedTickets[index] = updatedTicket;
-                return updatedTickets;
-            } else {
-                // Si el ticket no existe, agrégalo a la lista
-                return [...prevTickets, updatedTicket];
-            }
-        });
+    const handleTicketUpdate = (updatedTicket, action) => {
+        switch (action) {
+            case 'add':
+                console.log('Se añadió un nuevo ticket:', updatedTicket);
+                setTickets(prevTickets => [...prevTickets, updatedTicket]);
+                break;
+            case 'update':
+                console.log('Se actualizó un ticket:', updatedTicket);
+                setTickets(prevTickets => {
+                    const existingTicketIndex = prevTickets.findIndex(ticket => ticket.id === updatedTicket.id);
+                    if (existingTicketIndex !== -1) {
+                        const newTickets = [...prevTickets];
+                        newTickets[existingTicketIndex] = updatedTicket;
+                        return newTickets;
+                    } else {
+                        return [...prevTickets, updatedTicket];
+                    }
+                });
+                break;
+            case 'delete':
+                console.log('Se eliminó un ticket:', updatedTicket);
+                setTickets(prevTickets => prevTickets.filter(ticket => ticket.id !== updatedTicket.id));
+                break;
+            default:
+                console.log('Acción desconocida:', action);
+                break;
+        }
+        if (updatedTicket.delivered) {
+            setTickets(prevTickets => prevTickets.filter(ticket => ticket.id !== updatedTicket.id));
+        }
     };
+
     function calculateTotal(ticketItems) {
         let total = 0;
         for (const item of ticketItems) {
@@ -66,10 +83,14 @@ function TicketView() {
 
     useEffect(() => {
         fetchTickets();
-    }, [showModal]);
+        return () => {
+            setIsComponentMounted(false); // Cambia el estado cuando se desmonta el componente
+        };
+    }, []);
 
     return (
         <Container className='mt-5'>
+            {isComponentMounted && <TicketWebsocketController onTicketUpdate={handleTicketUpdate} />}
             <Row>
                 {tickets.map(ticket => (
                     <Col key={ticket.id} md={4} className="mb-3">
@@ -85,6 +106,7 @@ function TicketView() {
                                     </li>
                                 ))}
                                 <Card.Footer>{ticket.comment}</Card.Footer>
+                                <Card.Footer>Entregado: {ticket.delivered == true ? 'Sí' : 'No'}</Card.Footer>
                                 <Card.Text style={{ opacity: 0.6 }}>Total: {calculateTotal(ticket.ticketItems)}$</Card.Text>
                                 <Button variant="success" onClick={() => handleMarkAsDelivered(ticket.id)}>Entregado</Button>
                             </Card.Body>
@@ -95,8 +117,6 @@ function TicketView() {
             <Col md={12} className="mb-3">
                 <Button variant="primary" onClick={handleShowModal}>Crear Ticket</Button>
             </Col>
-            {/* Componente TicketWebsocketController para manejar las actualizaciones de tickets */}
-            <TicketWebsocketController onTicketUpdate={handleTicketUpdate} />
             {/* Modal para crear un ticket */}
             <ConfirmationDialog message="¿Seguro?" /> {/* Renderiza la ventana de confirmación */}
             <TicketFormModal show={showModal} handleClose={handleCloseModal} addNewTicket={addNewTicket} />
